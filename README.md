@@ -1,46 +1,36 @@
 ## Requirements
-* albumentations==1.3.0
-* inplace_abn==1.1.0
+* python>=3.8
+* SimpleITK==2.2.1
 * mmcv==2.2.0
 * numpy==1.24.3
-* torch==2.0.1
-* torchvision==0.15.2
 
-## Data
-* [LiTS](https://www.kaggle.com/andrewmvd/liver-tumor-segmentation) 130 CT scans for segmentation of the liver as well as tumor lesions.
+## Synthetic Tumor Generation Method Based on Medical Prior Knowledge
+In liver tumor segmentation tasks, the scarcity of annotated data (e.g., only 131 cases in the LiTS dataset) and the insufficient samples of early small tumors pose significant challenges. Traditional generative models (such as GANs or VAEs) tend to produce blurry boundaries or distorted shapes. This project innovatively proposes a procedural synthetic tumor generation framework that incorporates medical prior knowledge from the Liver Imaging Reporting and Data System (LI-RADS) to achieve high-fidelity tumor synthesis. This approach effectively alleviates the impact of data scarcity on model training.
 
-## Installation
-```bash
-git clone https://github.com/AI4MyBUPT/dpaa.git
-cd dpaa 
-pip install -r requirements.txt
-```
+# Date process
 
-# Model 
+<p align="center"><img width="100%" src="figures/pipeline.png" /></p>
 
-## Model structure
+### 1. Intelligent Localization and Vessel Avoidance
+This step focuses on ensuring anatomical accuracy by identifying vascular regions and preventing tumor generation in close proximity to critical structures.  
+- **Vessel Segmentation**: The `segment_vessels` function identifies blood vessels using a predefined HU range (150–300).  
+- **Safety Collision Detection**: The `gen_position` algorithm leverages distance transformation to maintain safe distances between generated tumors and nearby vessels, preserving realistic spatial relationships.
 
-Uses a series of convolutional layers (DoubleConv) and max-pooling operations (Down) to extract hierarchical features 
+### 2. Multi-Stage Morphological Modeling
+Tumor morphology is modeled through a combination of geometric foundations and advanced deformation techniques to simulate realistic shapes and textures.  
+- **Basic Geometry**: A 3D ellipsoid serves as the initial structure to represent early-stage tumors with regular shapes.  
+- **Advanced Deformations**:  
+  - Elastic deformation dynamically adjusts based on tumor size to create irregularities.  
+  - Fractal noise is applied to larger tumors (≥10mm) to generate lobulated edges, mimicking complex tumor boundaries.
 
-Branch 1: Captures high-resolution global information through fewer downsampling steps.  
+### 3. Pathological Texture Synthesis
+- **HU Value Modeling**:
+  - **Necrotic Core**: Increases the HU value in the central region.
+  - **Steatosis**: Random patches attenuate HU values.
+- **Smoothing and Edge Enhancement**: Gaussian smoothing eliminates artificial artifacts, while morphological edge enhancement highlights the tumor capsule for better delineation.
 
-Branch 2: Extracts patch-level features using a convolutional layer with a large stride.
-
-<p align="center"><img width="100%" src="figures/net.png" /></p>
-
-## DPAA Attention Mechanism
-
-The DPAA (Dynamic Patch-Aware Attention) module is designed to compute attention weights by dynamically assessing the similarity between image patches and shallow layer features. 
-
-This process allows for the explicit modeling of the importance weights of different image regions, thereby highlighting the most relevant areas for the task at hand.
-
-By emphasizing these critical regions, DPAA enhances the model's decision-making capabilities, leading to more accurate and refined segmentation outputs. The mechanism effectively integrates local details with global context, ensuring 
-
-that the model can make more informed predictions while preserving important details and boundaries.
-
-<p align="center"><img width="100%" src="figures/dpaa.png" /></p>
+<p align="center"><img width="100%" src="figures/syn.png" /></p>
 
 ## Run the codes
 ```bash
-train: python train.py 
-validate: python val.py
+Run: python main.py -i input_dir -o output_dir
