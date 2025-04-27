@@ -30,7 +30,7 @@ def generate_perlin_noise(shape, scale=20, octaves=3, persistence=0.5, lacunarit
     return world
 
 def apply_complex_deformation(geo, D):
-    """应用复合形变（高斯+Perlin）"""
+    """复合形变（高斯+Perlin）"""
     sigma_e = 0.5 + 0.1 * (D/30)**2
     lambda_val = 0.1 * (1 + D/20)
     
@@ -67,9 +67,6 @@ def gen_position(mask_scan, vessel_mask, R):
 
 
 def get_ellipsoid(x, y, z):
-    """"
-    x, y, z is the radius of this ellipsoid in x, y, z direction respectly.
-    """
     sh = (4*x, 4*y, 4*z)
     out = np.zeros(sh, int)
     aux = np.zeros(sh)
@@ -109,18 +106,14 @@ def get_predefined_texture(shape, hu_liver):
     return gaussian_filter(base, sigma=1.5)
 
 
-# Step 2 : generate the ellipsoid
+
 def get_ellipsoid(x, y, z):
-    """"
-    x, y, z is the radius of this ellipsoid in x, y, z direction respectly.
-    """
     sh = (4*x, 4*y, 4*z)
     out = np.zeros(sh, int)
     aux = np.zeros(sh)
     radii = np.array([x, y, z])
-    com = np.array([2*x, 2*y, 2*z])  # center point
+    com = np.array([2*x, 2*y, 2*z])  
 
-    # calculate the ellipsoid 
     bboxl = np.floor(com-radii).clip(0,None).astype(int)
     bboxh = (np.ceil(com+radii)+1).clip(None, sh).astype(int)
     roi = out[tuple(map(slice,bboxl,bboxh))]
@@ -199,7 +192,7 @@ def get_tumor(volume_scan, mask_scan, tumor_type, texture):
     geo_mask = get_fixed_geo(mask_scan, tumor_type)
 
     sigma      = np.random.uniform(1, 2)
-    difference = np.random.uniform(65, 145)    #65, 145
+    difference = np.random.uniform(65, 145)    
 
 
     geo_blur = gaussian_filter(geo_mask*1.0, sigma)

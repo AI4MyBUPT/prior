@@ -56,7 +56,6 @@ def process_single_case(image_path, label_path, output_dir):
         return False
 
 def main(input_dir, output_dir):
-    """主处理流程"""
     validate_paths(input_dir, output_dir)
 
     image_paths = sorted(glob.glob(os.path.join(input_dir, 'imagesTr', '*.nii.gz')))
