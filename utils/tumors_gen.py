@@ -90,10 +90,9 @@ def get_ellipsoid(x, y, z):
     return out
 
 def get_predefined_texture(shape, hu_liver):
-    """纹理生成（含中心坏死和脂肪变性）"""
+    """纹理生成"""
     base = hu_liver + np.random.normal(0, 15, shape)
     
-
     center = tuple(d//2 for d in shape)
     dist_map = np.sqrt(sum((np.indices(shape) - np.array(center)[:,None,None,None])**2))
     necrosis_mask = dist_map < min(shape)//3
@@ -128,7 +127,7 @@ def get_ellipsoid(x, y, z):
     return out
 
 def get_fixed_geo(mask_scan, tumor_type, vessel_mask=None):
-    """改进版肿瘤几何生成函数（整合血管检测和复合形变）"""
+    """改进版肿瘤几何生成函数"""
 
     TUMOR_PARAMS = {
         'small': {
